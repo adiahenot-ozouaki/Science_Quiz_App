@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Quiz Scientifique",
+      "hasCanvas": false,
+      "bodyTextLen": 325,
+      "bodyTextHash": "385d80930bce059a202932d34e5e3ade159bae90ac95654d46f2d36d4203d42b",
+      "bodyTextPrefix": "LABORATOIRE Quiz scientifique Huit questions, vingt secondes cha",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Quiz Scientifique",
+      "hasCanvas": false,
+      "bodyTextLen": 325,
+      "bodyTextHash": "385d80930bce059a202932d34e5e3ade159bae90ac95654d46f2d36d4203d42b",
+      "bodyTextPrefix": "LABORATOIRE Quiz scientifique Huit questions, vingt secondes cha",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

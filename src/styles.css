@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0c10;
+  --color-foreground: #e8eaee;
+  --color-card: #12151b;
+  --color-card-foreground: #e8eaee;
+  --color-muted: #1a1e26;
+  --color-muted-foreground: #8b919c;
+  --color-primary: #d5dbe3;
+  --color-primary-foreground: #0a0c10;
+  --color-secondary: #161a21;
+  --color-secondary-foreground: #e8eaee;
+  --color-border: color-mix(in oklab, #e8eaee 12%, transparent);
+  --color-border-strong: color-mix(in oklab, #e8eaee 22%, transparent);
+  --color-ring: #9eb0c4;
+  --color-success: #7d9a86;
+  --color-success-soft: color-mix(in oklab, #7d9a86 16%, #12151b);
+  --color-danger: #b07a76;
+  --color-danger-soft: color-mix(in oklab, #b07a76 16%, #12151b);
+
+  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-foreground);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
