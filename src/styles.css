@@ -59,7 +59,136 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
   }
+}
+
+/* —— Animations feedback quiz —— */
+
+@keyframes quiz-pop-correct {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-success) 0%, transparent);
+  }
+  40% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-success) 28%, transparent);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-success) 0%, transparent);
+  }
+}
+
+@keyframes quiz-shake-wrong {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-6px);
+  }
+  30% {
+    transform: translateX(5px);
+  }
+  45% {
+    transform: translateX(-4px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes quiz-flash-correct {
+  0% {
+    background-color: color-mix(in oklab, var(--color-success) 35%, var(--color-card));
+  }
+  100% {
+    background-color: var(--color-success-soft);
+  }
+}
+
+@keyframes quiz-flash-wrong {
+  0% {
+    background-color: color-mix(in oklab, var(--color-danger) 32%, var(--color-card));
+  }
+  100% {
+    background-color: var(--color-danger-soft);
+  }
+}
+
+@keyframes quiz-feedback-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes quiz-points-float {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.9);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes quiz-check-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-12deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.quiz-anim-correct {
+  animation:
+    quiz-pop-correct 0.55s var(--ease-out) both,
+    quiz-flash-correct 0.45s var(--ease-out) both;
+}
+
+.quiz-anim-wrong {
+  animation:
+    quiz-shake-wrong 0.45s var(--ease-out) both,
+    quiz-flash-wrong 0.4s var(--ease-out) both;
+}
+
+.quiz-anim-answer-reveal {
+  animation: quiz-pop-correct 0.5s 0.08s var(--ease-out) both;
+}
+
+.quiz-anim-feedback {
+  animation: quiz-feedback-in 0.35s var(--ease-out) both;
+}
+
+.quiz-anim-points {
+  display: inline-block;
+  animation: quiz-points-float 0.45s 0.05s var(--ease-out) both;
+}
+
+.quiz-anim-icon {
+  display: inline-flex;
+  animation: quiz-check-in 0.4s var(--ease-out) both;
 }

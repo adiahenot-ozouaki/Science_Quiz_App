@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Clock, Flame, Trophy, Volume2, VolumeX } from "lucide-react";
+import { ArrowRight, Check, Clock, Flame, Trophy, Volume2, VolumeX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CATEGORIES } from "@/lib/quiz-data";
@@ -124,7 +124,12 @@ export function PlayScreen() {
         <div className="flex items-center gap-3 text-sm tabular-nums">
           <span className="inline-flex items-center gap-1 text-muted-foreground">
             <Trophy className="size-3.5" />
-            {livePoints}
+            <span
+              key={livePoints}
+              className={locked ? "quiz-anim-points tabular-nums" : "tabular-nums"}
+            >
+              {livePoints}
+            </span>
           </span>
           {streak >= 2 ? (
             <span className="inline-flex items-center gap-1 text-foreground">
@@ -176,6 +181,8 @@ export function PlayScreen() {
           const isSel = selected === i;
           const isAns = i === q.answer;
           const show = locked;
+          const isCorrectPick = show && isAns;
+          const isWrongPick = show && isSel && !isAns;
           return (
             <li key={`${q.id}-${i}`}>
               <button
@@ -183,18 +190,37 @@ export function PlayScreen() {
                 disabled={locked}
                 onClick={() => select(i)}
                 className={cn(
-                  "flex min-h-12 w-full items-center rounded-[var(--radius-md)] border px-4 py-3 text-left text-[0.95rem] leading-snug transition-[background-color,border-color,color,transform] duration-[var(--motion-quick)]",
+                  "relative flex min-h-12 w-full items-center rounded-[var(--radius-md)] border px-4 py-3 text-left text-[0.95rem] leading-snug transition-[background-color,border-color,color,transform] duration-[var(--motion-quick)]",
                   !show &&
                     "border-border bg-card text-foreground hover:border-border-strong hover:bg-muted active:scale-[0.99]",
-                  show && isAns && "border-success/40 bg-success-soft text-foreground",
-                  show && isSel && !isAns && "border-danger/40 bg-danger-soft text-foreground",
-                  show && !isSel && !isAns && "border-border bg-card text-muted-foreground",
+                  isCorrectPick &&
+                    "quiz-anim-correct border-success/40 bg-success-soft text-foreground",
+                  isWrongPick &&
+                    "quiz-anim-wrong border-danger/40 bg-danger-soft text-foreground",
+                  show &&
+                    isAns &&
+                    !isSel &&
+                    "quiz-anim-answer-reveal border-success/40 bg-success-soft text-foreground",
+                  show &&
+                    !isSel &&
+                    !isAns &&
+                    "border-border bg-card text-muted-foreground opacity-60",
                 )}
               >
                 <span className="mr-3 font-mono text-xs text-muted-foreground">
                   {String.fromCharCode(65 + i)}
                 </span>
-                {choice}
+                <span className="flex-1">{choice}</span>
+                {isCorrectPick ? (
+                  <span className="quiz-anim-icon ml-2 text-success">
+                    <Check className="size-4" strokeWidth={2.5} />
+                  </span>
+                ) : null}
+                {isWrongPick ? (
+                  <span className="quiz-anim-icon ml-2 text-danger">
+                    <X className="size-4" strokeWidth={2.5} />
+                  </span>
+                ) : null}
               </button>
             </li>
           );
@@ -203,26 +229,35 @@ export function PlayScreen() {
 
       {locked ? (
         <div
+          key={`fb-${q.id}-${selected}`}
           className={cn(
-            "mt-5 rounded-[var(--radius-md)] border px-4 py-3 text-sm leading-relaxed",
+            "quiz-anim-feedback mt-5 rounded-[var(--radius-md)] border px-4 py-3 text-sm leading-relaxed",
             selected === q.answer
               ? "border-success/30 bg-success-soft text-foreground"
-              : "border-border bg-muted text-muted-foreground",
+              : "border-danger/25 bg-danger-soft text-foreground",
           )}
         >
           {selected === q.answer ? (
-            <p className="mb-1 font-medium text-foreground">
+            <p className="mb-1 flex items-center gap-2 font-medium text-foreground">
+              <span className="quiz-anim-icon text-success">
+                <Check className="size-4" strokeWidth={2.5} />
+              </span>
               Correct
-              {answers[answers.length - 1]?.points
-                ? ` · +${answers[answers.length - 1].points} pts`
-                : null}
+              {answers[answers.length - 1]?.points ? (
+                <span className="quiz-anim-points font-mono text-success">
+                  +{answers[answers.length - 1].points} pts
+                </span>
+              ) : null}
             </p>
           ) : (
-            <p className="mb-1 font-medium text-foreground">
+            <p className="mb-1 flex items-center gap-2 font-medium text-foreground">
+              <span className="quiz-anim-icon text-danger">
+                <X className="size-4" strokeWidth={2.5} />
+              </span>
               {selected == null ? "Temps écoulé" : "Incorrect"}
             </p>
           )}
-          <p>{q.explain}</p>
+          <p className="text-muted-foreground">{q.explain}</p>
         </div>
       ) : (
         <p className="mt-4 text-xs text-muted-foreground">
