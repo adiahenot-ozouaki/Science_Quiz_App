@@ -18,6 +18,8 @@
   --color-success-soft: color-mix(in oklab, #7d9a86 16%, #12151b);
   --color-danger: #b07a76;
   --color-danger-soft: color-mix(in oklab, #b07a76 16%, #12151b);
+  --color-accent: #8ba3c7;
+  --color-accent-soft: color-mix(in oklab, #8ba3c7 14%, #12151b);
 
   --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-display: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -32,6 +34,7 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --motion-quick: 150ms;
   --motion-fast: 250ms;
+  --motion-med: 400ms;
 }
 
 @layer base {
@@ -52,6 +55,16 @@
     font-family: var(--font-sans);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklab, #8ba3c7 14%, transparent), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, color-mix(in oklab, #7d9a86 8%, transparent), transparent),
+      radial-gradient(ellipse 50% 30% at 0% 80%, color-mix(in oklab, #b07a76 6%, transparent), transparent);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -65,7 +78,35 @@
   }
 }
 
-/* —— Animations feedback quiz —— */
+@keyframes quiz-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quiz-page {
+  animation: quiz-page-in var(--motion-med) var(--ease-out) both;
+}
+
+.quiz-card-lift {
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
+}
+.quiz-card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in oklab, #000 35%, transparent);
+}
+.quiz-card-lift:active {
+  transform: translateY(0);
+}
 
 @keyframes quiz-pop-correct {
   0% {
@@ -163,6 +204,15 @@
   }
 }
 
+@keyframes quiz-score-ring {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: var(--score-offset, 0);
+  }
+}
+
 .quiz-anim-correct {
   animation:
     quiz-pop-correct 0.55s var(--ease-out) both,
@@ -191,4 +241,8 @@
 .quiz-anim-icon {
   display: inline-flex;
   animation: quiz-check-in 0.4s var(--ease-out) both;
+}
+
+.quiz-score-ring-circle {
+  animation: quiz-score-ring 0.9s var(--ease-out) both;
 }
