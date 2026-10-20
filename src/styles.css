@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0a0c10;
+  --color-bg: #05070c;
   --color-foreground: #e8eaee;
   --color-card: #12151b;
   --color-card-foreground: #e8eaee;
@@ -57,17 +57,17 @@
     -webkit-font-smoothing: antialiased;
     position: relative;
     isolation: isolate;
-    background-color: var(--color-bg);
+    overflow-x: hidden;
+    background-color: #05070c;
     background-image:
-      radial-gradient(ellipse 90% 55% at 50% -15%, color-mix(in oklab, #6b8caf 22%, transparent), transparent 70%),
-      radial-gradient(ellipse 50% 45% at 95% 90%, color-mix(in oklab, #5a7a68 14%, transparent), transparent 65%),
-      radial-gradient(ellipse 45% 40% at 5% 85%, color-mix(in oklab, #8a5a58 10%, transparent), transparent 60%),
-      radial-gradient(ellipse 40% 30% at 80% 20%, color-mix(in oklab, #7a6aad 8%, transparent), transparent 55%),
-      linear-gradient(180deg, #0a0c10 0%, #0c1018 45%, #0a0c10 100%);
+      radial-gradient(ellipse 100% 80% at 50% -30%, color-mix(in oklab, #1a2a4a 55%, transparent), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, color-mix(in oklab, #0f1a14 40%, transparent), transparent 50%),
+      radial-gradient(ellipse 50% 40% at 0% 90%, color-mix(in oklab, #1a1218 35%, transparent), transparent 50%),
+      linear-gradient(180deg, #05070c 0%, #0a0e16 50%, #05070c 100%);
     background-attachment: fixed;
   }
 
-  /* Grille labo + étoiles */
+  /* Champ d'étoiles dense */
   body::before {
     content: "";
     position: fixed;
@@ -75,75 +75,90 @@
     z-index: -2;
     pointer-events: none;
     background-image:
-      linear-gradient(
-        color-mix(in oklab, #e8eaee 4.5%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in oklab, #e8eaee 4.5%, transparent) 1px,
-        transparent 1px
-      ),
-      radial-gradient(1.5px 1.5px at 12% 18%, color-mix(in oklab, #e8eaee 55%, transparent), transparent),
-      radial-gradient(1px 1px at 28% 42%, color-mix(in oklab, #e8eaee 40%, transparent), transparent),
-      radial-gradient(1.5px 1.5px at 45% 12%, color-mix(in oklab, #c5d4e8 50%, transparent), transparent),
-      radial-gradient(1px 1px at 62% 55%, color-mix(in oklab, #e8eaee 35%, transparent), transparent),
-      radial-gradient(2px 2px at 78% 22%, color-mix(in oklab, #e8eaee 45%, transparent), transparent),
-      radial-gradient(1px 1px at 88% 68%, color-mix(in oklab, #e8eaee 30%, transparent), transparent),
-      radial-gradient(1.5px 1.5px at 8% 72%, color-mix(in oklab, #b8c9a8 40%, transparent), transparent),
-      radial-gradient(1px 1px at 35% 88%, color-mix(in oklab, #e8eaee 35%, transparent), transparent),
-      radial-gradient(1px 1px at 55% 35%, color-mix(in oklab, #e8eaee 28%, transparent), transparent),
-      radial-gradient(1.5px 1.5px at 70% 80%, color-mix(in oklab, #e8eaee 40%, transparent), transparent),
-      radial-gradient(1px 1px at 92% 40%, color-mix(in oklab, #e8eaee 32%, transparent), transparent),
-      radial-gradient(1px 1px at 18% 55%, color-mix(in oklab, #e8eaee 25%, transparent), transparent);
-    background-size:
-      48px 48px,
-      48px 48px,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%,
-      100% 100%;
-    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat,
-      no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
-      no-repeat;
-    mask-image: radial-gradient(ellipse 75% 70% at 50% 40%, black 20%, transparent 100%);
-    opacity: 0.9;
+      radial-gradient(1px 1px at 3% 8%, #fff, transparent),
+      radial-gradient(1px 1px at 8% 22%, rgba(255, 255, 255, 0.7), transparent),
+      radial-gradient(1.5px 1.5px at 12% 45%, #fff, transparent),
+      radial-gradient(1px 1px at 18% 12%, rgba(200, 220, 255, 0.85), transparent),
+      radial-gradient(1px 1px at 22% 68%, rgba(255, 255, 255, 0.6), transparent),
+      radial-gradient(1.5px 1.5px at 27% 35%, #fff, transparent),
+      radial-gradient(1px 1px at 31% 88%, rgba(255, 255, 255, 0.55), transparent),
+      radial-gradient(1px 1px at 36% 18%, rgba(180, 210, 255, 0.9), transparent),
+      radial-gradient(2px 2px at 41% 52%, rgba(255, 255, 255, 0.95), transparent),
+      radial-gradient(1px 1px at 45% 78%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(1px 1px at 48% 8%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 53% 42%, rgba(220, 230, 255, 0.9), transparent),
+      radial-gradient(1px 1px at 58% 65%, rgba(255, 255, 255, 0.65), transparent),
+      radial-gradient(1px 1px at 62% 28%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 67% 90%, rgba(200, 230, 255, 0.8), transparent),
+      radial-gradient(1px 1px at 71% 15%, rgba(255, 255, 255, 0.7), transparent),
+      radial-gradient(2px 2px at 76% 48%, #fff, transparent),
+      radial-gradient(1px 1px at 80% 72%, rgba(255, 255, 255, 0.55), transparent),
+      radial-gradient(1px 1px at 84% 5%, rgba(190, 210, 255, 0.85), transparent),
+      radial-gradient(1.5px 1.5px at 88% 38%, #fff, transparent),
+      radial-gradient(1px 1px at 92% 82%, rgba(255, 255, 255, 0.6), transparent),
+      radial-gradient(1px 1px at 96% 25%, rgba(255, 255, 255, 0.75), transparent),
+      radial-gradient(1px 1px at 5% 55%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(1.5px 1.5px at 15% 92%, #fff, transparent),
+      radial-gradient(1px 1px at 25% 5%, rgba(210, 225, 255, 0.8), transparent),
+      radial-gradient(1px 1px at 33% 60%, rgba(255, 255, 255, 0.45), transparent),
+      radial-gradient(2px 2px at 50% 25%, rgba(255, 255, 255, 0.9), transparent),
+      radial-gradient(1px 1px at 60% 95%, rgba(255, 255, 255, 0.55), transparent),
+      radial-gradient(1px 1px at 73% 58%, rgba(200, 220, 255, 0.7), transparent),
+      radial-gradient(1.5px 1.5px at 85% 12%, #fff, transparent),
+      radial-gradient(1px 1px at 98% 60%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(1px 1px at 10% 38%, rgba(255, 255, 255, 0.4), transparent),
+      radial-gradient(1px 1px at 40% 95%, rgba(255, 255, 255, 0.45), transparent),
+      radial-gradient(1.5px 1.5px at 55% 5%, rgba(220, 235, 255, 0.85), transparent),
+      radial-gradient(1px 1px at 68% 42%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(1px 1px at 90% 55%, rgba(255, 255, 255, 0.65), transparent);
+    background-repeat: repeat;
+    background-size: 320px 320px;
+    animation: quiz-stars-drift 120s linear infinite;
+    opacity: 0.85;
   }
 
-  /* Anneaux orbitaux */
+  /* Voie lactée + étoiles plus brillantes */
   body::after {
     content: "";
     position: fixed;
+    inset: 0;
     z-index: -1;
     pointer-events: none;
-    width: min(920px, 140vw);
-    height: min(920px, 140vw);
-    top: 50%;
-    left: 50%;
-    translate: -50% -42%;
-    border-radius: 50%;
-    border: 1px solid color-mix(in oklab, #8ba3c7 12%, transparent);
-    box-shadow:
-      0 0 0 60px color-mix(in oklab, #8ba3c7 3.5%, transparent),
-      inset 0 0 0 1px color-mix(in oklab, #8ba3c7 6%, transparent),
-      0 0 0 140px color-mix(in oklab, #8ba3c7 2.5%, transparent),
-      0 0 0 220px color-mix(in oklab, #8ba3c7 1.8%, transparent);
-    opacity: 0.55;
+    background-image:
+      radial-gradient(ellipse 80% 25% at 50% 40%, color-mix(in oklab, #8ba3c7 8%, transparent), transparent 70%),
+      radial-gradient(ellipse 50% 15% at 40% 45%, color-mix(in oklab, #a8b8d8 5%, transparent), transparent 70%),
+      radial-gradient(2px 2px at 10% 20%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 30% 70%, rgba(200, 230, 255, 0.95), transparent),
+      radial-gradient(2.5px 2.5px at 55% 30%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 75% 85%, rgba(255, 255, 255, 0.9), transparent),
+      radial-gradient(2px 2px at 90% 15%, rgba(220, 235, 255, 0.95), transparent),
+      radial-gradient(1.5px 1.5px at 20% 90%, #fff, transparent),
+      radial-gradient(2px 2px at 65% 10%, rgba(255, 255, 255, 0.85), transparent),
+      radial-gradient(1.5px 1.5px at 42% 55%, rgba(190, 215, 255, 0.9), transparent),
+      radial-gradient(2px 2px at 85% 45%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 5% 50%, rgba(255, 255, 255, 0.8), transparent);
+    background-size:
+      100% 100%,
+      100% 100%,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px,
+      280px 280px;
+    background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
+    animation: quiz-stars-twinkle 4s ease-in-out infinite alternate;
+    opacity: 0.9;
   }
 
-  @media (max-width: 640px) {
+  @media (prefers-reduced-motion: reduce) {
+    body::before,
     body::after {
-      opacity: 0.35;
-      width: 120vw;
-      height: 120vw;
+      animation: none !important;
     }
   }
 
@@ -160,6 +175,24 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+@keyframes quiz-stars-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 320px 320px;
+  }
+}
+
+@keyframes quiz-stars-twinkle {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
   }
 }
 
