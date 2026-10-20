@@ -2,6 +2,7 @@ import { LayoutGrid, RotateCcw, Share2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CATEGORIES } from "@/lib/quiz-data";
+import { DIFFICULTIES } from "@/lib/quiz-modes";
 import { pointsOf, scoreOf, useQuiz } from "@/lib/quiz-store";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -12,7 +13,11 @@ export function ResultScreen() {
   const category = useQuiz((s) => s.category);
   const best = useQuiz((s) => s.best);
   const maxStreak = useQuiz((s) => s.maxStreak);
+  const mode = useQuiz((s) => s.mode);
+  const difficulty = useQuiz((s) => s.difficulty);
+  const dailyKey = useQuiz((s) => s.dailyKey);
   const start = useQuiz((s) => s.start);
+  const startDaily = useQuiz((s) => s.startDaily);
   const home = useQuiz((s) => s.home);
   const [copied, setCopied] = useState(false);
 
@@ -30,11 +35,20 @@ export function ResultScreen() {
           : "À retravailler";
 
   const catTitle =
-    category === "all"
-      ? "Mixte"
-      : CATEGORIES.find((c) => c.id === category)?.title;
+    mode === "daily"
+      ? `Défi du jour${dailyKey ? ` · ${dailyKey}` : ""}`
+      : category === "all"
+        ? `Mixte · ${DIFFICULTIES.find((d) => d.id === difficulty)?.title ?? ""}`
+        : `${CATEGORIES.find((c) => c.id === category)?.title} · ${
+            DIFFICULTIES.find((d) => d.id === difficulty)?.title ?? ""
+          }`;
 
-  const isRecord = best[category] != null && best[category] === pts && pts > 0;
+  const recordKey =
+    mode === "daily" && dailyKey
+      ? `daily:${dailyKey}`
+      : `${category}:${difficulty}`;
+  const record = best[recordKey];
+  const isRecord = record != null && record === pts && pts > 0;
 
   async function share() {
     const text = `Quiz Scientifique (${catTitle}) : ${score}/${total} · ${pts} pts${
@@ -83,11 +97,11 @@ export function ResultScreen() {
               </span>
             </span>
           ) : null}
-          {best[category] != null ? (
+          {record != null ? (
             <span>
               Record{" "}
               <span className="font-mono tabular-nums text-foreground">
-                {best[category]}
+                {record}
               </span>{" "}
               pts
               {isRecord ? " · nouveau !" : null}
@@ -97,7 +111,13 @@ export function ResultScreen() {
       </header>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button className="flex-1" size="lg" onClick={() => start(category)}>
+        <Button
+          className="flex-1"
+          size="lg"
+          onClick={() =>
+            mode === "daily" ? startDaily() : start(category, difficulty)
+          }
+        >
           <RotateCcw className="size-4" />
           Rejouer
         </Button>

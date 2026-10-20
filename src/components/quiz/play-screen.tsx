@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Clock, Flame, Trophy, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CATEGORIES, SECONDS_PER_QUESTION } from "@/lib/quiz-data";
+import { CATEGORIES } from "@/lib/quiz-data";
+import { DIFFICULTIES } from "@/lib/quiz-modes";
 import { pointsOf, useQuiz } from "@/lib/quiz-store";
 import { isMuted, loadMute, setMuted, unlockAudio } from "@/lib/quiz-sounds";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,9 @@ export function PlayScreen() {
   const next = useQuiz((s) => s.next);
   const tick = useQuiz((s) => s.tick);
   const home = useQuiz((s) => s.home);
+  const mode = useQuiz((s) => s.mode);
+  const difficulty = useQuiz((s) => s.difficulty);
+  const secondsPerQuestion = useQuiz((s) => s.secondsPerQuestion);
   const [mute, setMute] = useState(false);
 
   useEffect(() => {
@@ -31,6 +35,10 @@ export function PlayScreen() {
     category === "all"
       ? CATEGORIES.find((c) => c.id === q?.category)?.title
       : CATEGORIES.find((c) => c.id === category)?.title;
+  const modeLabel =
+    mode === "daily"
+      ? "Défi du jour"
+      : DIFFICULTIES.find((d) => d.id === difficulty)?.title;
   const livePoints = pointsOf(answers);
   const urgent = remaining <= 5 && !locked;
 
@@ -82,7 +90,7 @@ export function PlayScreen() {
 
   const progress = ((index + (locked ? 1 : 0)) / questions.length) * 100;
   const last = index + 1 >= questions.length;
-  const timerRatio = remaining / SECONDS_PER_QUESTION;
+  const timerRatio = remaining / secondsPerQuestion;
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-6 sm:py-10">
@@ -156,7 +164,7 @@ export function PlayScreen() {
       </div>
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-        {catLabel} · {index + 1} / {questions.length}
+        {modeLabel} · {catLabel} · {index + 1} / {questions.length}
       </p>
 
       <h2 className="mt-3 font-display text-2xl font-medium leading-snug tracking-tight text-foreground sm:text-[1.75rem]">
