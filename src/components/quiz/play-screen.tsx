@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Clock, Flame, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CATEGORIES } from "@/lib/quiz-data";
-import { useQuiz } from "@/lib/quiz-store";
+import { CATEGORIES, SECONDS_PER_QUESTION } from "@/lib/quiz-data";
+import { pointsOf, useQuiz } from "@/lib/quiz-store";
 import { cn } from "@/lib/utils";
 
 export function PlayScreen() {
@@ -13,6 +13,8 @@ export function PlayScreen() {
   const locked = useQuiz((s) => s.locked);
   const remaining = useQuiz((s) => s.remaining);
   const category = useQuiz((s) => s.category);
+  const answers = useQuiz((s) => s.answers);
+  const streak = useQuiz((s) => s.streak);
   const select = useQuiz((s) => s.select);
   const next = useQuiz((s) => s.next);
   const tick = useQuiz((s) => s.tick);
@@ -21,22 +23,64 @@ export function PlayScreen() {
   const q = questions[index];
   const catLabel =
     category === "all"
-      ? CATEGORIES.find((c) => c.id === q.category)?.title
+      ? CATEGORIES.find((c) => c.id === q?.category)?.title
       : CATEGORIES.find((c) => c.id === category)?.title;
+  const livePoints = pointsOf(answers);
+  const urgent = remaining <= 5 && !locked;
 
   useEffect(() => {
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [tick, index]);
 
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === "Escape") {
+        home();
+        return;
+      }
+      if (!locked) {
+        const map: Record<string, number> = {
+          "1": 0,
+          "2": 1,
+          "3": 2,
+          "4": 3,
+          a: 0,
+          b: 1,
+          c: 2,
+          d: 3,
+          A: 0,
+          B: 1,
+          C: 2,
+          D: 3,
+        };
+        if (e.key in map) {
+          e.preventDefault();
+          select(map[e.key]);
+          return;
+        }
+      }
+      if (locked && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        next();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [locked, select, next, home]);
+
   if (!q) return null;
 
   const progress = ((index + (locked ? 1 : 0)) / questions.length) * 100;
   const last = index + 1 >= questions.length;
+  const timerRatio = remaining / SECONDS_PER_QUESTION;
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-6 sm:py-10">
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={home}
@@ -44,13 +88,47 @@ export function PlayScreen() {
         >
           Quitter
         </button>
-        <div className="flex items-center gap-2 text-sm tabular-nums text-muted-foreground">
-          <Clock className="size-3.5" />
-          {remaining}s
+        <div className="flex items-center gap-3 text-sm tabular-nums">
+          <span className="inline-flex items-center gap-1 text-muted-foreground">
+            <Trophy className="size-3.5" />
+            {livePoints}
+          </span>
+          {streak >= 2 ? (
+            <span className="inline-flex items-center gap-1 text-foreground">
+              <Flame className="size-3.5 text-amber-400" />
+              ×{streak}
+            </span>
+          ) : null}
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 font-medium",
+              urgent ? "text-danger" : "text-muted-foreground",
+            )}
+          >
+            <Clock className={cn("size-3.5", urgent && "animate-pulse")} />
+            {remaining}s
+          </span>
         </div>
       </div>
 
-      <Progress value={progress} />
+      <div className="relative">
+        <Progress value={progress} />
+        <div
+          className={cn(
+            "mt-1.5 h-1 overflow-hidden rounded-full bg-muted",
+            urgent && "ring-1 ring-danger/40",
+          )}
+          aria-hidden
+        >
+          <div
+            className={cn(
+              "h-full origin-left rounded-full transition-[width,background-color] duration-1000 ease-linear",
+              urgent ? "bg-danger" : "bg-ring/70",
+            )}
+            style={{ width: `${timerRatio * 100}%` }}
+          />
+        </div>
+      </div>
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
         {catLabel} · {index + 1} / {questions.length}
@@ -66,15 +144,15 @@ export function PlayScreen() {
           const isAns = i === q.answer;
           const show = locked;
           return (
-            <li key={choice}>
+            <li key={`${q.id}-${i}`}>
               <button
                 type="button"
                 disabled={locked}
                 onClick={() => select(i)}
                 className={cn(
-                  "flex min-h-12 w-full items-center rounded-[var(--radius-md)] border px-4 py-3 text-left text-[0.95rem] leading-snug transition-[background-color,border-color,color] duration-[var(--motion-quick)]",
+                  "flex min-h-12 w-full items-center rounded-[var(--radius-md)] border px-4 py-3 text-left text-[0.95rem] leading-snug transition-[background-color,border-color,color,transform] duration-[var(--motion-quick)]",
                   !show &&
-                    "border-border bg-card text-foreground hover:border-border-strong hover:bg-muted",
+                    "border-border bg-card text-foreground hover:border-border-strong hover:bg-muted active:scale-[0.99]",
                   show && isAns && "border-success/40 bg-success-soft text-foreground",
                   show && isSel && !isAns && "border-danger/40 bg-danger-soft text-foreground",
                   show && !isSel && !isAns && "border-border bg-card text-muted-foreground",
@@ -91,18 +169,36 @@ export function PlayScreen() {
       </ul>
 
       {locked ? (
-        <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-          {q.explain}
+        <div
+          className={cn(
+            "mt-5 rounded-[var(--radius-md)] border px-4 py-3 text-sm leading-relaxed",
+            selected === q.answer
+              ? "border-success/30 bg-success-soft text-foreground"
+              : "border-border bg-muted text-muted-foreground",
+          )}
+        >
+          {selected === q.answer ? (
+            <p className="mb-1 font-medium text-foreground">
+              Correct
+              {answers[answers.length - 1]?.points
+                ? ` · +${answers[answers.length - 1].points} pts`
+                : null}
+            </p>
+          ) : (
+            <p className="mb-1 font-medium text-foreground">
+              {selected == null ? "Temps écoulé" : "Incorrect"}
+            </p>
+          )}
+          <p>{q.explain}</p>
+        </div>
+      ) : (
+        <p className="mt-4 text-xs text-muted-foreground">
+          Raccourcis : A–D ou 1–4 · Entrée pour continuer
         </p>
-      ) : null}
+      )}
 
       <div className="mt-auto pt-8">
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={next}
-          disabled={!locked}
-        >
+        <Button className="w-full" size="lg" onClick={next} disabled={!locked}>
           {last ? "Voir le résultat" : "Question suivante"}
           <ArrowRight className="size-4" />
         </Button>
