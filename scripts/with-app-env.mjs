@@ -111,7 +111,14 @@ function main(argv) {
     process.exit(2);
   }
   const env = mergeAppEnv(readAppEnv(projectRoot()), process.env);
-  const child = spawn(command, args, { stdio: "inherit", env });
+  // On Windows, npm bin shims are *.cmd — spawn without shell cannot find them.
+  // Prefer node_modules/.bin via PATH (set by npm run); shell:true resolves .cmd.
+  const isWin = process.platform === "win32";
+  const child = spawn(command, args, {
+    stdio: "inherit",
+    env,
+    shell: isWin,
+  });
   // The dev server is long-running and is stopped by signalling this wrapper.
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));
