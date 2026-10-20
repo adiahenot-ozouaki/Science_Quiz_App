@@ -1,9 +1,12 @@
 import { create } from "zustand";
 import {
   type CategoryId,
+  type Difficulty,
   type Question,
+  difficultyConfig,
+  pickDailyQuestions,
   pickQuestions,
-  SECONDS_PER_QUESTION,
+  todayKey,
 } from "./quiz-data";
 import {
   playComplete,
@@ -15,6 +18,7 @@ import {
 } from "./quiz-sounds";
 
 export type Screen = "home" | "play" | "result";
+export type PlayMode = "classic" | "daily";
 
 export type AnswerRecord = {
   questionId: string;
@@ -26,7 +30,10 @@ export type AnswerRecord = {
 
 type QuizState = {
   screen: Screen;
+  mode: PlayMode;
   category: CategoryId | "all";
+  difficulty: Difficulty;
+  dailyKey: string | null;
   questions: Question[];
   index: number;
   selected: number | null;
@@ -35,17 +42,19 @@ type QuizState = {
   remaining: number;
   streak: number;
   maxStreak: number;
-  /** Best points per category key */
+  secondsPerQuestion: number;
+  /** Best points — clés: category, category:difficulty, daily:YYYY-MM-DD */
   best: Record<string, number>;
   hydrate: () => void;
-  start: (category: CategoryId | "all") => void;
+  start: (category: CategoryId | "all", difficulty?: Difficulty) => void;
+  startDaily: () => void;
   select: (choice: number) => void;
   next: () => void;
   home: () => void;
   tick: () => void;
 };
 
-const BEST_KEY = "scientific-quiz-best-v2";
+const BEST_KEY = "scientific-quiz-best-v3";
 
 function loadBest(): Record<string, number> {
   try {
@@ -60,7 +69,18 @@ function saveBest(best: Record<string, number>) {
   localStorage.setItem(BEST_KEY, JSON.stringify(best));
 }
 
-/** 100 pts for a correct answer + 5 pts per second left; streak ×10 bonus after 2+ */
+export function bestKeyClassic(
+  category: CategoryId | "all",
+  difficulty: Difficulty,
+) {
+  return `${category}:${difficulty}`;
+}
+
+export function bestKeyDaily(date: string) {
+  return `daily:${date}`;
+}
+
+/** 100 pts + 5 × secondes restantes ; bonus série dès 2+ */
 export function pointsForAnswer(
   correct: boolean,
   timeLeft: number,
@@ -72,18 +92,25 @@ export function pointsForAnswer(
   return base + streakBonus;
 }
 
+function recordKey(get: () => QuizState): string {
+  const s = get();
+  if (s.mode === "daily" && s.dailyKey) return bestKeyDaily(s.dailyKey);
+  return bestKeyClassic(s.category, s.difficulty);
+}
+
 function finishIfLast(
   set: (p: Partial<QuizState>) => void,
   get: () => QuizState,
   answers: AnswerRecord[],
   maxStreak: number,
 ) {
-  const { index, questions, category, best } = get();
+  const { index, questions, best } = get();
   if (index + 1 >= questions.length) {
     const pts = answers.reduce((s, a) => s + a.points, 0);
+    const key = recordKey(get);
     const nextBest = { ...best };
-    if ((nextBest[category] ?? 0) < pts) {
-      nextBest[category] = pts;
+    if ((nextBest[key] ?? 0) < pts) {
+      nextBest[key] = pts;
       saveBest(nextBest);
     }
     playComplete();
@@ -101,28 +128,59 @@ function finishIfLast(
 
 export const useQuiz = create<QuizState>((set, get) => ({
   screen: "home",
+  mode: "classic",
   category: "all",
+  difficulty: "medium",
+  dailyKey: null,
   questions: [],
   index: 0,
   selected: null,
   locked: false,
   answers: [],
-  remaining: SECONDS_PER_QUESTION,
+  remaining: 20,
   streak: 0,
   maxStreak: 0,
+  secondsPerQuestion: 20,
   best: {},
   hydrate: () => set({ best: loadBest() }),
-  start: (category) => {
+  start: (category, difficulty = "medium") => {
     unlockAudio();
+    const cfg = difficultyConfig(difficulty);
     set({
       screen: "play",
+      mode: "classic",
       category,
-      questions: pickQuestions(category),
+      difficulty,
+      dailyKey: null,
+      questions: pickQuestions({ category, difficulty }),
       index: 0,
       selected: null,
       locked: false,
       answers: [],
-      remaining: SECONDS_PER_QUESTION,
+      remaining: cfg.seconds,
+      secondsPerQuestion: cfg.seconds,
+      streak: 0,
+      maxStreak: 0,
+      best: loadBest(),
+    });
+  },
+  startDaily: () => {
+    unlockAudio();
+    const key = todayKey();
+    const cfg = difficultyConfig("medium");
+    set({
+      screen: "play",
+      mode: "daily",
+      category: "all",
+      difficulty: "medium",
+      dailyKey: key,
+      questions: pickDailyQuestions(key),
+      index: 0,
+      selected: null,
+      locked: false,
+      answers: [],
+      remaining: cfg.seconds,
+      secondsPerQuestion: cfg.seconds,
       streak: 0,
       maxStreak: 0,
       best: loadBest(),
@@ -182,7 +240,7 @@ export const useQuiz = create<QuizState>((set, get) => ({
       index: state.index + 1,
       selected: null,
       locked: false,
-      remaining: SECONDS_PER_QUESTION,
+      remaining: state.secondsPerQuestion,
       streak,
       maxStreak,
     });
@@ -197,6 +255,7 @@ export const useQuiz = create<QuizState>((set, get) => ({
       locked: false,
       streak: 0,
       maxStreak: 0,
+      dailyKey: null,
     }),
   tick: () => {
     const { screen, locked, remaining } = get();
