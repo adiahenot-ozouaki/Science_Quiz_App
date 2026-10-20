@@ -93,13 +93,13 @@ export function PlayScreen() {
   const timerRatio = remaining / secondsPerQuestion;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-6 sm:py-10">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="quiz-page mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 pb-8 pt-4 sm:pb-12 sm:pt-8">
+      <div className="sticky top-0 z-10 -mx-5 mb-5 flex items-center justify-between gap-3 border-b border-border/60 bg-bg/80 px-5 py-3 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={home}
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
           >
             Quitter
           </button>
@@ -121,8 +121,8 @@ export function PlayScreen() {
             )}
           </button>
         </div>
-        <div className="flex items-center gap-3 text-sm tabular-nums">
-          <span className="inline-flex items-center gap-1 text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm tabular-nums">
+          <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card/60 px-2.5 py-1 text-muted-foreground">
             <Trophy className="size-3.5" />
             <span
               key={livePoints}
@@ -132,15 +132,17 @@ export function PlayScreen() {
             </span>
           </span>
           {streak >= 2 ? (
-            <span className="inline-flex items-center gap-1 text-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card/60 px-2.5 py-1 text-foreground">
               <Flame className="size-3.5 text-amber-400" />
               ×{streak}
             </span>
           ) : null}
           <span
             className={cn(
-              "inline-flex items-center gap-1.5 font-medium",
-              urgent ? "text-danger" : "text-muted-foreground",
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-medium",
+              urgent
+                ? "border-danger/40 bg-danger-soft text-danger"
+                : "border-border bg-card/60 text-muted-foreground",
             )}
           >
             <Clock className={cn("size-3.5", urgent && "animate-pulse")} />
@@ -172,7 +174,10 @@ export function PlayScreen() {
         {modeLabel} · {catLabel} · {index + 1} / {questions.length}
       </p>
 
-      <h2 className="mt-3 font-display text-2xl font-medium leading-snug tracking-tight text-foreground sm:text-[1.75rem]">
+      <h2
+        key={q.id}
+        className="quiz-anim-feedback mt-3 font-display text-2xl font-medium leading-snug tracking-tight text-foreground sm:text-[1.85rem]"
+      >
         {q.prompt}
       </h2>
 
@@ -190,7 +195,7 @@ export function PlayScreen() {
                 disabled={locked}
                 onClick={() => select(i)}
                 className={cn(
-                  "relative flex min-h-12 w-full items-center rounded-[var(--radius-md)] border px-4 py-3 text-left text-[0.95rem] leading-snug transition-[background-color,border-color,color,transform] duration-[var(--motion-quick)]",
+                  "relative flex min-h-14 w-full items-center rounded-[var(--radius-md)] border px-4 py-3.5 text-left text-[0.95rem] leading-snug transition-[background-color,border-color,color,transform] duration-[var(--motion-quick)]",
                   !show &&
                     "border-border bg-card text-foreground hover:border-border-strong hover:bg-muted active:scale-[0.99]",
                   isCorrectPick &&
@@ -207,7 +212,16 @@ export function PlayScreen() {
                     "border-border bg-card text-muted-foreground opacity-60",
                 )}
               >
-                <span className="mr-3 font-mono text-xs text-muted-foreground">
+                <span
+                  className={cn(
+                    "mr-3 flex size-7 shrink-0 items-center justify-center rounded-full border font-mono text-xs",
+                    show && isAns
+                      ? "border-success/40 bg-success-soft text-foreground"
+                      : show && isSel && !isAns
+                        ? "border-danger/40 bg-danger-soft text-foreground"
+                        : "border-border bg-secondary text-muted-foreground",
+                  )}
+                >
                   {String.fromCharCode(65 + i)}
                 </span>
                 <span className="flex-1">{choice}</span>
