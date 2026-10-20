@@ -7,13 +7,25 @@ import {
   Shuffle,
   Volume2,
   VolumeX,
+  CalendarDays,
 } from "lucide-react";
-import { CATEGORIES, QUIZ_LENGTH, type Category } from "@/lib/quiz-data";
-import { useQuiz } from "@/lib/quiz-store";
+import {
+  CATEGORIES,
+  DIFFICULTIES,
+  type Category,
+  type Difficulty,
+  todayKey,
+} from "@/lib/quiz-data";
+import {
+  bestKeyClassic,
+  bestKeyDaily,
+  useQuiz,
+} from "@/lib/quiz-store";
 import { isMuted, loadMute, setMuted, unlockAudio } from "@/lib/quiz-sounds";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 const ICONS = {
@@ -62,9 +74,14 @@ function CategoryCard({
 
 export function HomeScreen() {
   const start = useQuiz((s) => s.start);
+  const startDaily = useQuiz((s) => s.startDaily);
   const best = useQuiz((s) => s.best);
   const hydrate = useQuiz((s) => s.hydrate);
   const [mute, setMute] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+  const day = todayKey();
+  const dailyBest = best[bestKeyDaily(day)];
+  const cfg = DIFFICULTIES.find((d) => d.id === difficulty)!;
 
   useEffect(() => {
     hydrate();
@@ -103,20 +120,77 @@ export function HomeScreen() {
           Quiz scientifique
         </h1>
         <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-          {QUIZ_LENGTH} questions, vingt secondes chacune. Réponds vite pour
-          maximiser tes points — les séries rapportent un bonus.
+          Choisis un niveau, une discipline — ou le défi du jour, identique pour
+          tout le monde.
         </p>
       </header>
+
+      {/* Défi du jour */}
+      <button type="button" onClick={startDaily} className="text-left">
+        <Card className="transition-[border-color,background-color] duration-[var(--motion-quick)] hover:border-border-strong hover:bg-muted">
+          <CardContent className="flex items-start gap-4 p-5">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-secondary text-foreground">
+              <CalendarDays className="size-4" strokeWidth={1.6} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="font-display text-lg font-medium tracking-tight">
+                  Défi du jour
+                </h2>
+                <Badge variant="outline">{day}</Badge>
+                {dailyBest != null ? (
+                  <Badge variant="outline">{dailyBest} pts</Badge>
+                ) : null}
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Même tirage pour tous · 10 questions · 20 s · niveau moyen
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </button>
+
+      {/* Niveau */}
+      <div className="flex flex-col gap-3">
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          Niveau
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {DIFFICULTIES.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              onClick={() => setDifficulty(d.id)}
+              className={cn(
+                "rounded-[var(--radius-md)] border px-3 py-3 text-left transition-[border-color,background-color] duration-[var(--motion-quick)]",
+                difficulty === d.id
+                  ? "border-border-strong bg-muted text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:border-border-strong hover:text-foreground",
+              )}
+            >
+              <span className="block text-sm font-medium text-foreground">
+                {d.title}
+              </span>
+              <span className="mt-0.5 block text-[0.7rem] leading-snug opacity-80">
+                {d.seconds}s · {d.length} q.
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">{cfg.blurb}</p>
+      </div>
 
       <Button
         size="lg"
         className="w-full sm:w-auto"
-        onClick={() => start("all")}
+        onClick={() => start("all", difficulty)}
       >
         <Shuffle className="size-4" />
-        Mixte
-        {best.all != null ? (
-          <span className="ml-1 opacity-70">· record {best.all} pts</span>
+        Mixte · {cfg.title}
+        {best[bestKeyClassic("all", difficulty)] != null ? (
+          <span className="ml-1 opacity-70">
+            · record {best[bestKeyClassic("all", difficulty)]} pts
+          </span>
         ) : null}
       </Button>
 
@@ -125,8 +199,8 @@ export function HomeScreen() {
           <CategoryCard
             key={cat.id}
             cat={cat}
-            best={best[cat.id]}
-            onPick={() => start(cat.id)}
+            best={best[bestKeyClassic(cat.id, difficulty)]}
+            onPick={() => start(cat.id, difficulty)}
           />
         ))}
       </div>
