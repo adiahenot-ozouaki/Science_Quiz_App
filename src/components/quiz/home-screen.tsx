@@ -9,13 +9,12 @@ import {
   VolumeX,
   CalendarDays,
 } from "lucide-react";
+import { CATEGORIES, type Category } from "@/lib/quiz-data";
 import {
-  CATEGORIES,
   DIFFICULTIES,
-  type Category,
   type Difficulty,
   todayKey,
-} from "@/lib/quiz-data";
+} from "@/lib/quiz-modes";
 import {
   bestKeyClassic,
   bestKeyDaily,
@@ -125,7 +124,6 @@ export function HomeScreen() {
         </p>
       </header>
 
-      {/* Défi du jour */}
       <button type="button" onClick={startDaily} className="text-left">
         <Card className="transition-[border-color,background-color] duration-[var(--motion-quick)] hover:border-border-strong hover:bg-muted">
           <CardContent className="flex items-start gap-4 p-5">
@@ -150,7 +148,6 @@ export function HomeScreen() {
         </Card>
       </button>
 
-      {/* Niveau */}
       <div className="flex flex-col gap-3">
         <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
           Niveau
