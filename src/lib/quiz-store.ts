@@ -1,13 +1,12 @@
 import { create } from "zustand";
+import { type CategoryId, type Question } from "./quiz-data";
 import {
-  type CategoryId,
   type Difficulty,
-  type Question,
   difficultyConfig,
   pickDailyQuestions,
   pickQuestions,
   todayKey,
-} from "./quiz-data";
+} from "./quiz-modes";
 import {
   playComplete,
   playCorrect,
@@ -43,7 +42,6 @@ type QuizState = {
   streak: number;
   maxStreak: number;
   secondsPerQuestion: number;
-  /** Best points — clés: category, category:difficulty, daily:YYYY-MM-DD */
   best: Record<string, number>;
   hydrate: () => void;
   start: (category: CategoryId | "all", difficulty?: Difficulty) => void;
@@ -80,7 +78,6 @@ export function bestKeyDaily(date: string) {
   return `daily:${date}`;
 }
 
-/** 100 pts + 5 × secondes restantes ; bonus série dès 2+ */
 export function pointsForAnswer(
   correct: boolean,
   timeLeft: number,
