@@ -1,11 +1,11 @@
-import { LayoutGrid, RotateCcw, Share2, Check, X } from "lucide-react";
+import { LayoutGrid, RotateCcw, Share2, Check, X, Flame, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CATEGORIES } from "@/lib/quiz-data";
 import { DIFFICULTIES } from "@/lib/quiz-modes";
 import { pointsOf, scoreOf, useQuiz } from "@/lib/quiz-store";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 export function ResultScreen() {
   const answers = useQuiz((s) => s.answers);
@@ -50,6 +50,8 @@ export function ResultScreen() {
   const record = best[recordKey];
   const isRecord = record != null && record === pts && pts > 0;
 
+  const ringOffset = 100 - ratio * 100;
+
   async function share() {
     const text = `Quiz Scientifique (${catTitle}) : ${score}/${total} · ${pts} pts${
       maxStreak >= 2 ? ` · série ×${maxStreak}` : ""
@@ -60,7 +62,7 @@ export function ResultScreen() {
         return;
       }
     } catch {
-      /* user cancelled or unsupported */
+      /* cancelled */
     }
     try {
       await navigator.clipboard.writeText(text);
@@ -72,47 +74,93 @@ export function ResultScreen() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-5 py-10 sm:py-16">
-      <header className="flex flex-col gap-3">
+    <div className="quiz-page mx-auto flex w-full max-w-2xl flex-col gap-8 px-5 py-10 sm:py-16">
+      <header className="flex flex-col items-center gap-5 text-center">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           {catTitle}
         </p>
-        <h1 className="font-display text-4xl font-medium tracking-[-0.03em]">
-          {title}
-        </h1>
-        <p className="font-mono text-3xl tabular-nums text-foreground">
-          {score}
-          <span className="text-muted-foreground">/{total}</span>
-        </p>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          <span>
-            <span className="font-mono tabular-nums text-foreground">{pts}</span>{" "}
-            points
+
+        <div className="relative flex size-28 items-center justify-center">
+          <svg
+            viewBox="0 0 36 36"
+            className="absolute inset-0 size-full -rotate-90"
+            aria-hidden
+          >
+            <circle
+              cx="18"
+              cy="18"
+              r="15.915"
+              fill="none"
+              className="stroke-muted"
+              strokeWidth="2.2"
+            />
+            <circle
+              cx="18"
+              cy="18"
+              r="15.915"
+              fill="none"
+              className={cn(
+                "quiz-score-ring-circle",
+                ratio >= 0.75
+                  ? "stroke-success"
+                  : ratio >= 0.5
+                    ? "stroke-ring"
+                    : "stroke-danger",
+              )}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeDasharray="100"
+              style={
+                {
+                  ["--score-offset" as string]: String(ringOffset),
+                  strokeDashoffset: ringOffset,
+                } as CSSProperties
+              }
+            />
+          </svg>
+          <p className="font-mono text-2xl tabular-nums text-foreground">
+            {score}
+            <span className="text-base text-muted-foreground">/{total}</span>
+          </p>
+        </div>
+
+        <div>
+          <h1 className="font-display text-3xl font-medium tracking-[-0.03em] sm:text-4xl">
+            {title}
+          </h1>
+          {isRecord ? (
+            <p className="mt-1.5 text-sm font-medium text-success">
+              Nouveau record !
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-3 py-1.5 text-sm">
+            <Trophy className="size-3.5 text-muted-foreground" />
+            <span className="font-mono tabular-nums text-foreground">{pts}</span>
+            <span className="text-muted-foreground">pts</span>
           </span>
           {maxStreak >= 2 ? (
-            <span>
-              Meilleure série{" "}
-              <span className="font-mono tabular-nums text-foreground">
-                ×{maxStreak}
-              </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-3 py-1.5 text-sm">
+              <Flame className="size-3.5 text-amber-400" />
+              <span className="font-mono tabular-nums">×{maxStreak}</span>
             </span>
           ) : null}
           {record != null ? (
-            <span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-3 py-1.5 text-sm text-muted-foreground">
               Record{" "}
               <span className="font-mono tabular-nums text-foreground">
                 {record}
-              </span>{" "}
-              pts
-              {isRecord ? " · nouveau !" : null}
+              </span>
             </span>
           ) : null}
         </div>
       </header>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <Button
-          className="flex-1"
+          className="h-11 flex-1"
           size="lg"
           onClick={() =>
             mode === "daily" ? startDaily() : start(category, difficulty)
@@ -121,66 +169,76 @@ export function ResultScreen() {
           <RotateCcw className="size-4" />
           Rejouer
         </Button>
-        <Button className="flex-1" size="lg" variant="secondary" onClick={home}>
+        <Button className="h-11 flex-1" size="lg" variant="secondary" onClick={home}>
           <LayoutGrid className="size-4" />
           Disciplines
         </Button>
-        <Button className="flex-1" size="lg" variant="outline" onClick={share}>
+        <Button className="h-11 flex-1" size="lg" variant="outline" onClick={share}>
           <Share2 className="size-4" />
           {copied ? "Copié" : "Partager"}
         </Button>
       </div>
 
-      <ul className="flex flex-col gap-2">
-        {questions.map((q, i) => {
-          const rec = answers[i];
-          const ok = rec?.correct;
-          const chose =
-            rec?.choice != null ? q.choices[rec.choice] : "Sans réponse";
-          return (
-            <li key={q.id}>
-              <Card>
-                <CardContent className="flex gap-3 p-4">
-                  <span
-                    className={cn(
-                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full",
-                      ok ? "bg-success-soft text-success" : "bg-danger-soft text-danger",
-                    )}
-                  >
-                    {ok ? (
-                      <Check className="size-3" strokeWidth={2.5} />
-                    ) : (
-                      <X className="size-3" strokeWidth={2.5} />
-                    )}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm leading-snug text-foreground">
-                      {q.prompt}
-                    </p>
-                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                      <span className="text-foreground/80">Bonne réponse : </span>
-                      {q.choices[q.answer]}
-                    </p>
-                    {!ok ? (
-                      <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                        <span className="text-foreground/80">Ta réponse : </span>
-                        {chose}
+      <section className="flex flex-col gap-2" aria-label="Détail des réponses">
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          Détail
+        </p>
+        <ul className="flex flex-col gap-2">
+          {questions.map((q, i) => {
+            const rec = answers[i];
+            const ok = rec?.correct;
+            const chose =
+              rec?.choice != null ? q.choices[rec.choice] : "Sans réponse";
+            return (
+              <li key={q.id}>
+                <Card className="border-border/80">
+                  <CardContent className="flex gap-3 p-4">
+                    <span
+                      className={cn(
+                        "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
+                        ok
+                          ? "bg-success-soft text-success"
+                          : "bg-danger-soft text-danger",
+                      )}
+                    >
+                      {ok ? (
+                        <Check className="size-3.5" strokeWidth={2.5} />
+                      ) : (
+                        <X className="size-3.5" strokeWidth={2.5} />
+                      )}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm leading-snug text-foreground">
+                        <span className="mr-1.5 font-mono text-xs text-muted-foreground">
+                          {i + 1}.
+                        </span>
+                        {q.prompt}
                       </p>
-                    ) : rec?.points ? (
-                      <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                        +{rec.points} pts
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                        <span className="text-foreground/75">Bonne réponse : </span>
+                        {q.choices[q.answer]}
                       </p>
-                    ) : null}
-                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground/90">
-                      {q.explain}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </li>
-          );
-        })}
-      </ul>
+                      {!ok ? (
+                        <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                          <span className="text-foreground/75">Ta réponse : </span>
+                          {chose}
+                        </p>
+                      ) : rec?.points ? (
+                        <p className="mt-0.5 text-xs tabular-nums text-success/90">
+                          +{rec.points} pts
+                        </p>
+                      ) : null}
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground/85">
+                        {q.explain}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     </div>
   );
 }
