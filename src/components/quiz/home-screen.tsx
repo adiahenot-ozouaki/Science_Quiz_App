@@ -8,6 +8,7 @@ import {
   Volume2,
   VolumeX,
   CalendarDays,
+  ChevronRight,
 } from "lucide-react";
 import { CATEGORIES, type Category } from "@/lib/quiz-data";
 import {
@@ -46,24 +47,37 @@ function CategoryCard({
 }) {
   const Icon = ICONS[cat.icon];
   return (
-    <button type="button" onClick={onPick} className="group text-left">
-      <Card className="h-full transition-[border-color,background-color] duration-[var(--motion-quick)] hover:border-border-strong hover:bg-muted">
+    <button
+      type="button"
+      onClick={onPick}
+      className="group text-left focus-visible:outline-none"
+    >
+      <Card className="quiz-card-lift h-full border-border/80 hover:border-border-strong hover:bg-muted/80">
         <CardContent className="flex flex-col gap-4 p-5">
           <div className="flex items-start justify-between gap-3">
-            <span className="flex size-10 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-secondary text-foreground">
-              <Icon className="size-4" strokeWidth={1.6} />
+            <span className="flex size-11 items-center justify-center rounded-[var(--radius-md)] border border-border bg-secondary text-accent transition-colors group-hover:border-border-strong group-hover:text-foreground">
+              <Icon className="size-[1.1rem]" strokeWidth={1.6} />
             </span>
             {best != null ? (
-              <Badge variant="outline">{best} pts</Badge>
+              <Badge variant="outline" className="tabular-nums">
+                {best} pts
+              </Badge>
             ) : (
-              <Badge variant="outline">Nouveau</Badge>
+              <Badge variant="outline" className="text-muted-foreground">
+                Nouveau
+              </Badge>
             )}
           </div>
-          <div>
-            <h2 className="font-display text-lg font-medium tracking-tight">
-              {cat.title}
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">{cat.blurb}</p>
+          <div className="flex items-end justify-between gap-2">
+            <div>
+              <h2 className="font-display text-lg font-medium tracking-tight">
+                {cat.title}
+              </h2>
+              <p className="mt-1 text-sm leading-snug text-muted-foreground">
+                {cat.blurb}
+              </p>
+            </div>
+            <ChevronRight className="mb-0.5 size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
           </div>
         </CardContent>
       </Card>
@@ -95,16 +109,16 @@ export function HomeScreen() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 sm:py-16">
+    <div className="quiz-page mx-auto flex w-full max-w-3xl flex-col gap-9 px-5 py-10 sm:gap-11 sm:py-16">
       <header className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Laboratoire
           </p>
           <button
             type="button"
             onClick={toggleMute}
-            className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur-sm transition-colors hover:border-border-strong hover:text-foreground"
             aria-label={mute ? "Activer le son" : "Couper le son"}
           >
             {mute ? (
@@ -115,94 +129,122 @@ export function HomeScreen() {
             {mute ? "Muet" : "Son"}
           </button>
         </div>
-        <h1 className="font-display text-4xl font-medium leading-[1.1] tracking-[-0.03em] text-foreground sm:text-5xl">
+        <h1 className="font-display text-[2.35rem] font-medium leading-[1.08] tracking-[-0.035em] text-foreground sm:text-5xl">
           Quiz scientifique
         </h1>
-        <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-          Choisis un niveau, une discipline — ou le défi du jour, identique pour
-          tout le monde.
+        <p className="max-w-xl text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base">
+          Choisis un niveau, une discipline — ou relève le défi du jour,
+          identique pour tout le monde.
         </p>
       </header>
 
-      <button type="button" onClick={startDaily} className="text-left">
-        <Card className="transition-[border-color,background-color] duration-[var(--motion-quick)] hover:border-border-strong hover:bg-muted">
-          <CardContent className="flex items-start gap-4 p-5">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-border bg-secondary text-foreground">
-              <CalendarDays className="size-4" strokeWidth={1.6} />
+      <button
+        type="button"
+        onClick={startDaily}
+        className="group text-left focus-visible:outline-none"
+      >
+        <Card className="quiz-card-lift overflow-hidden border-border-strong/60 bg-gradient-to-br from-accent-soft/80 via-card to-card">
+          <CardContent className="flex items-start gap-4 p-5 sm:p-6">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-border-strong/50 bg-secondary text-foreground">
+              <CalendarDays className="size-[1.15rem]" strokeWidth={1.6} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-display text-lg font-medium tracking-tight">
+                <h2 className="font-display text-lg font-medium tracking-tight sm:text-xl">
                   Défi du jour
                 </h2>
-                <Badge variant="outline">{day}</Badge>
+                <Badge variant="outline" className="tabular-nums">
+                  {day}
+                </Badge>
                 {dailyBest != null ? (
-                  <Badge variant="outline">{dailyBest} pts</Badge>
-                ) : null}
+                  <Badge variant="outline" className="tabular-nums">
+                    Record {dailyBest} pts
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">Pas encore joué</Badge>
+                )}
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1.5 text-sm leading-snug text-muted-foreground">
                 Même tirage pour tous · 10 questions · 20 s · niveau moyen
+              </p>
+              <p className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-foreground/90 transition-transform group-hover:translate-x-0.5">
+                Commencer
+                <ChevronRight className="size-3.5" />
               </p>
             </div>
           </CardContent>
         </Card>
       </button>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-          Niveau
-        </p>
-        <div className="grid grid-cols-3 gap-2">
-          {DIFFICULTIES.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              onClick={() => setDifficulty(d.id)}
-              className={cn(
-                "rounded-[var(--radius-md)] border px-3 py-3 text-left transition-[border-color,background-color] duration-[var(--motion-quick)]",
-                difficulty === d.id
-                  ? "border-border-strong bg-muted text-foreground"
-                  : "border-border bg-card text-muted-foreground hover:border-border-strong hover:text-foreground",
-              )}
-            >
-              <span className="block text-sm font-medium text-foreground">
-                {d.title}
-              </span>
-              <span className="mt-0.5 block text-[0.7rem] leading-snug opacity-80">
-                {d.seconds}s · {d.length} q.
-              </span>
-            </button>
-          ))}
+      <section className="flex flex-col gap-3" aria-label="Niveau de difficulté">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            Niveau
+          </p>
+          <p className="text-xs text-muted-foreground">{cfg.blurb}</p>
         </div>
-        <p className="text-xs text-muted-foreground">{cfg.blurb}</p>
-      </div>
+        <div
+          className="grid grid-cols-3 gap-1.5 rounded-[var(--radius-lg)] border border-border bg-card/50 p-1.5"
+          role="radiogroup"
+          aria-label="Choisir le niveau"
+        >
+          {DIFFICULTIES.map((d) => {
+            const active = difficulty === d.id;
+            return (
+              <button
+                key={d.id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setDifficulty(d.id)}
+                className={cn(
+                  "rounded-[var(--radius-md)] px-2 py-3 text-center transition-[background-color,color,box-shadow] duration-[var(--motion-quick)]",
+                  active
+                    ? "bg-muted text-foreground shadow-sm ring-1 ring-border-strong"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <span className="block text-sm font-medium">{d.title}</span>
+                <span className="mt-0.5 block text-[0.68rem] tabular-nums opacity-75">
+                  {d.seconds}s · {d.length} q.
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       <Button
         size="lg"
-        className="w-full sm:w-auto"
+        className="h-12 w-full gap-2 text-base sm:w-auto sm:min-w-[14rem]"
         onClick={() => start("all", difficulty)}
       >
         <Shuffle className="size-4" />
         Mixte · {cfg.title}
         {best[bestKeyClassic("all", difficulty)] != null ? (
-          <span className="ml-1 opacity-70">
-            · record {best[bestKeyClassic("all", difficulty)]} pts
+          <span className="ml-0.5 tabular-nums opacity-70">
+            · {best[bestKeyClassic("all", difficulty)]} pts
           </span>
         ) : null}
       </Button>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {CATEGORIES.map((cat) => (
-          <CategoryCard
-            key={cat.id}
-            cat={cat}
-            best={best[bestKeyClassic(cat.id, difficulty)]}
-            onPick={() => start(cat.id, difficulty)}
-          />
-        ))}
-      </div>
+      <section className="flex flex-col gap-3" aria-label="Disciplines">
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          Disciplines
+        </p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {CATEGORIES.map((cat) => (
+            <CategoryCard
+              key={cat.id}
+              cat={cat}
+              best={best[bestKeyClassic(cat.id, difficulty)]}
+              onPick={() => start(cat.id, difficulty)}
+            />
+          ))}
+        </div>
+      </section>
 
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs leading-relaxed text-muted-foreground">
         100 pts + 5 × secondes restantes · bonus de série dès 2 bonnes réponses
         d’affilée
       </p>
