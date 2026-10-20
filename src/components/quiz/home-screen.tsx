@@ -1,10 +1,20 @@
-import { Atom, FlaskConical, Leaf, Orbit, Globe, Shuffle } from "lucide-react";
+import {
+  Atom,
+  FlaskConical,
+  Leaf,
+  Orbit,
+  Globe,
+  Shuffle,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { CATEGORIES, QUIZ_LENGTH, type Category } from "@/lib/quiz-data";
 import { useQuiz } from "@/lib/quiz-store";
+import { isMuted, loadMute, setMuted, unlockAudio } from "@/lib/quiz-sounds";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const ICONS = {
   atom: Atom,
@@ -54,17 +64,41 @@ export function HomeScreen() {
   const start = useQuiz((s) => s.start);
   const best = useQuiz((s) => s.best);
   const hydrate = useQuiz((s) => s.hydrate);
+  const [mute, setMute] = useState(false);
 
   useEffect(() => {
     hydrate();
+    setMute(loadMute());
   }, [hydrate]);
+
+  function toggleMute() {
+    unlockAudio();
+    const next = !isMuted();
+    setMuted(next);
+    setMute(next);
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 sm:py-16">
       <header className="flex flex-col gap-4">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          Laboratoire
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Laboratoire
+          </p>
+          <button
+            type="button"
+            onClick={toggleMute}
+            className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
+            aria-label={mute ? "Activer le son" : "Couper le son"}
+          >
+            {mute ? (
+              <VolumeX className="size-3.5" />
+            ) : (
+              <Volume2 className="size-3.5" />
+            )}
+            {mute ? "Muet" : "Son"}
+          </button>
+        </div>
         <h1 className="font-display text-4xl font-medium leading-[1.1] tracking-[-0.03em] text-foreground sm:text-5xl">
           Quiz scientifique
         </h1>

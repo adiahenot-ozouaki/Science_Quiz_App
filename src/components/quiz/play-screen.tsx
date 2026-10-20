@@ -1,9 +1,10 @@
-import { useEffect } from "react";
-import { ArrowRight, Clock, Flame, Trophy } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Clock, Flame, Trophy, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CATEGORIES, SECONDS_PER_QUESTION } from "@/lib/quiz-data";
 import { pointsOf, useQuiz } from "@/lib/quiz-store";
+import { isMuted, loadMute, setMuted, unlockAudio } from "@/lib/quiz-sounds";
 import { cn } from "@/lib/utils";
 
 export function PlayScreen() {
@@ -19,6 +20,11 @@ export function PlayScreen() {
   const next = useQuiz((s) => s.next);
   const tick = useQuiz((s) => s.tick);
   const home = useQuiz((s) => s.home);
+  const [mute, setMute] = useState(false);
+
+  useEffect(() => {
+    setMute(loadMute());
+  }, []);
 
   const q = questions[index];
   const catLabel =
@@ -81,13 +87,32 @@ export function PlayScreen() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-6 sm:py-10">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={home}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          Quitter
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={home}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Quitter
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              unlockAudio();
+              const next = !isMuted();
+              setMuted(next);
+              setMute(next);
+            }}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label={mute ? "Activer le son" : "Couper le son"}
+          >
+            {mute ? (
+              <VolumeX className="size-3.5" />
+            ) : (
+              <Volume2 className="size-3.5" />
+            )}
+          </button>
+        </div>
         <div className="flex items-center gap-3 text-sm tabular-nums">
           <span className="inline-flex items-center gap-1 text-muted-foreground">
             <Trophy className="size-3.5" />
