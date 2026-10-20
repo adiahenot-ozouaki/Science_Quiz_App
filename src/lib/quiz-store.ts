@@ -5,6 +5,14 @@ import {
   pickQuestions,
   SECONDS_PER_QUESTION,
 } from "./quiz-data";
+import {
+  playComplete,
+  playCorrect,
+  playTimeout,
+  playUrgentTick,
+  playWrong,
+  unlockAudio,
+} from "./quiz-sounds";
 
 export type Screen = "home" | "play" | "result";
 
@@ -78,6 +86,7 @@ function finishIfLast(
       nextBest[category] = pts;
       saveBest(nextBest);
     }
+    playComplete();
     set({
       screen: "result",
       answers,
@@ -104,6 +113,7 @@ export const useQuiz = create<QuizState>((set, get) => ({
   best: {},
   hydrate: () => set({ best: loadBest() }),
   start: (category) => {
+    unlockAudio();
     set({
       screen: "play",
       category,
@@ -122,10 +132,13 @@ export const useQuiz = create<QuizState>((set, get) => ({
     const { locked, questions, index, answers, remaining, streak, maxStreak } =
       get();
     if (locked) return;
+    unlockAudio();
     const q = questions[index];
     const correct = choice === q.answer;
     const nextStreak = correct ? streak + 1 : 0;
     const pts = pointsForAnswer(correct, remaining, nextStreak);
+    if (correct) playCorrect();
+    else playWrong();
     set({
       selected: choice,
       locked: true,
@@ -161,6 +174,7 @@ export const useQuiz = create<QuizState>((set, get) => ({
         },
       ];
       streak = 0;
+      playTimeout();
     }
     if (finishIfLast(set, get, answers, maxStreak)) return;
     set({
@@ -191,7 +205,11 @@ export const useQuiz = create<QuizState>((set, get) => ({
       get().next();
       return;
     }
-    set({ remaining: remaining - 1 });
+    const nextRemaining = remaining - 1;
+    if (nextRemaining <= 3) {
+      playUrgentTick();
+    }
+    set({ remaining: nextRemaining });
   },
 }));
 
