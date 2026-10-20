@@ -1,5 +1,5 @@
 import { Atom, FlaskConical, Leaf, Orbit, Globe, Shuffle } from "lucide-react";
-import { CATEGORIES, type Category } from "@/lib/quiz-data";
+import { CATEGORIES, QUIZ_LENGTH, type Category } from "@/lib/quiz-data";
 import { useQuiz } from "@/lib/quiz-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,7 @@ function CategoryCard({
 }) {
   const Icon = ICONS[cat.icon];
   return (
-    <button
-      type="button"
-      onClick={onPick}
-      className="group text-left"
-    >
+    <button type="button" onClick={onPick} className="group text-left">
       <Card className="h-full transition-[border-color,background-color] duration-[var(--motion-quick)] hover:border-border-strong hover:bg-muted">
         <CardContent className="flex flex-col gap-4 p-5">
           <div className="flex items-start justify-between gap-3">
@@ -37,7 +33,7 @@ function CategoryCard({
               <Icon className="size-4" strokeWidth={1.6} />
             </span>
             {best != null ? (
-              <Badge variant="outline">Meilleur {best}/8</Badge>
+              <Badge variant="outline">{best} pts</Badge>
             ) : (
               <Badge variant="outline">Nouveau</Badge>
             )}
@@ -73,16 +69,20 @@ export function HomeScreen() {
           Quiz scientifique
         </h1>
         <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-          Huit questions, vingt secondes chacune. Choisis une discipline — ou
-          mélange tout.
+          {QUIZ_LENGTH} questions, vingt secondes chacune. Réponds vite pour
+          maximiser tes points — les séries rapportent un bonus.
         </p>
       </header>
 
-      <Button size="lg" className="w-full sm:w-auto" onClick={() => start("all")}>
+      <Button
+        size="lg"
+        className="w-full sm:w-auto"
+        onClick={() => start("all")}
+      >
         <Shuffle className="size-4" />
         Mixte
         {best.all != null ? (
-          <span className="text-primary-foreground/70">· {best.all}/8</span>
+          <span className="ml-1 opacity-70">· record {best.all} pts</span>
         ) : null}
       </Button>
 
@@ -96,6 +96,11 @@ export function HomeScreen() {
           />
         ))}
       </div>
+
+      <p className="text-center text-xs text-muted-foreground">
+        100 pts + 5 × secondes restantes · bonus de série dès 2 bonnes réponses
+        d’affilée
+      </p>
     </div>
   );
 }
